@@ -35,7 +35,15 @@ namespace TesteNpgSql4._0._10.Model
             {
                 NpgsqlCommand cmd = new NpgsqlCommand(Query_, con);
                 cmd.Parameters.AddWithValue(1);
-                cmd.ExecuteNonQuery();
+                try
+                {
+                    cmd.ExecuteNonQuery();
+                    Console.WriteLine("Query Executada");
+                }
+                catch (Exception ex) {
+                    Console.WriteLine(ex.Message,"Query não foi executada");  
+                }    
+                
             }
 
 
@@ -43,7 +51,10 @@ namespace TesteNpgSql4._0._10.Model
             {
                 NpgsqlCommand cmd = new NpgsqlCommand(Query_, con);
                 NpgsqlDataReader dr = cmd.ExecuteReader();
-                Console.WriteLine(dr.ToString());
+                try
+                {
+                    Console.WriteLine(dr.ToString());
+                } catch (Exception ex) { Console.WriteLine(ex.Message); }  
                 return dr;
             }
 

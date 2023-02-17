@@ -11,8 +11,30 @@ namespace TesteNpgSql4._0._10
         static void Main(string[] args)
         {
             Console.WriteLine("Iniciando:");
-            InsertQuery();
+            Console.WriteLine("Realizando limpeza da tabela");
+            PartitionByQuery();
+            int repeat = 0;
+            Console.WriteLine("Inserindo 5 entradas na tabela");
+            while (repeat < 1000) {
+                InsertQuery();
+                repeat++;
+            }
+            Console.WriteLine("Selecionando as últimas 15 entradas na tabela");
             SelectQuery();
+        }
+        public static string PartitionByQuery()
+        {
+            QuestDBConnectionClass.Connection_Query dataSource = new QuestDBConnectionClass.Connection_Query();
+            string localdatestring = DateTime.Now.AddSeconds(-1).ToString("yyyy-MM-ddTHH:mm:ss");
+            var AlterQuery = "ALTER TABLE 'TestPartition' DROP PARTITION WHERE ts < to_timestamp('" + localdatestring + "', 'yyyy-MM-ddTHH:mm:ss');";
+            dataSource.OpenConection();
+            Console.WriteLine("Realisando Limpeza Com Partition By:");
+            Console.WriteLine(AlterQuery);
+            dataSource.ExecuteQueries(AlterQuery);
+
+            dataSource.CloseConnection();
+
+            return null;
         }
         public static Task InsertQuery()
         {
@@ -29,21 +51,25 @@ namespace TesteNpgSql4._0._10
             QuestDBConnectionClass.Connection_Query dataSource = new QuestDBConnectionClass.Connection_Query();
             var selectQuery = "SELECT * FROM 'TestPartition' ORDER BY ts DESC LIMIT 15";
             dataSource.OpenConection();
-            Console.WriteLine("Selecionando Tabela de Teste");
-
             using (var cmd = dataSource.DataReader(selectQuery))
             {
-                using (var reader = cmd)
-                    while (reader.Read())
-                    {
-                        Console.WriteLine(reader.GetTimeStamp(0));
-                    }
+                try
+                {
+                    using (var reader = cmd)
+                        while (reader.Read())
+                        {
+                            Console.WriteLine(reader.GetTimeStamp(0).ToString(), reader.GetString(1), reader.GetDouble(2));
+                        }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.ToString());   
+                }
             }
             dataSource.CloseConnection();
 
             return null;
         }
-
         private static float GenerateRandom()
         {
             Random r = new Random();
