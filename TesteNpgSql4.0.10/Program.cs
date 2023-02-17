@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reflection.PortableExecutable;
 using System.Threading.Tasks;
 using Npgsql;
 using TesteNpgSql4._0._10.Model;
@@ -27,9 +28,20 @@ namespace TesteNpgSql4._0._10
         {
             QuestDBConnectionClass.Connection_Query dataSource = new QuestDBConnectionClass.Connection_Query();
             var selectQuery = "SELECT * FROM 'TestPartition' ORDER BY ts DESC LIMIT 15";
-            var retorno = dataSource.DataReader(selectQuery);
-            string resultado = retorno.ToString();
-            return resultado;
+            dataSource.OpenConection();
+            Console.WriteLine("Selecionando Tabela de Teste");
+
+            using (var cmd = dataSource.DataReader(selectQuery))
+            {
+                using (var reader = cmd)
+                    while (reader.Read())
+                    {
+                        Console.WriteLine(reader.GetTimeStamp(0));
+                    }
+            }
+            dataSource.CloseConnection();
+
+            return null;
         }
 
         private static float GenerateRandom()

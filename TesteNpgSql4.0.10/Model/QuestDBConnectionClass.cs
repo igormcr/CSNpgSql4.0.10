@@ -16,7 +16,7 @@ namespace TesteNpgSql4._0._10.Model
             static string password = "quest";
             static string database = "qdb";
             static int port = 8812;
-            string ConnectionString = $@"host=localhost;port={port};username={username};password={password};database={database};ServerCompatibilityMode=NoTypeLoading;";
+            string ConnectionString = $@"host=192.168.15.121;port={port};username={username};password={password};database={database};ServerCompatibilityMode=NoTypeLoading;";
             NpgsqlConnection con;
 
             public void OpenConection()
@@ -43,6 +43,7 @@ namespace TesteNpgSql4._0._10.Model
             {
                 NpgsqlCommand cmd = new NpgsqlCommand(Query_, con);
                 NpgsqlDataReader dr = cmd.ExecuteReader();
+                Console.WriteLine(dr.ToString());
                 return dr;
             }
 
